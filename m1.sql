@@ -126,19 +126,18 @@ PRIMARY KEY (phone_number_id)
 /*
 
 -- weaves
--- SQLite doesn't support foreign keys either.
+
+-- SQL Server supports foreign keys.
+-- SQLite does not
 
 -- *section*
 
--- With a real database, we would be able to add foreign keys.
--- In SQLite, this is not implemented.
--- When you are able to run your SQL Server system,
--- you should be able to add these constraints.
+-- They appear in the Keys section.
 
 ALTER TABLE email_address
       ADD  CONSTRAINT FK_email_address_person 
       FOREIGN KEY(email_address_person_id)
-      REFERENCES person (person_id);
+      REFERENCES person (person_id)
       
 ALTER TABLE person_address
       ADD  CONSTRAINT FK_person_address_address
@@ -154,8 +153,11 @@ ALTER TABLE phone_number
       ADD  CONSTRAINT FK_phone_number_person 
       FOREIGN KEY(phone_number_person_id)
       REFERENCES person (person_id);
+      
+go
 
 */
+
 
 /*
 
@@ -169,6 +171,15 @@ ALTER TABLE phone_number
 
 -- The INSERT INTO statement is very verbose. You have to repeat all the 
 -- columns you want insert into and then all the values.
+
+We have to be careful we insert in the right order. It's the reverse order of the foreign keys and 
+is has-a relationships.
+
+SQL is annoying. It has to use Ternary Joins (or link tables) for has-a relationships. 
+And this is implemented by means of a link table. 
+
+person has-N address and address has-N person so use a link table person_address
+person has-N email_address but email_address has-a person, so no need to use a link table.
 
 */
 
@@ -236,30 +247,6 @@ address_country) VALUES (3,
 'Maine',
 'US');
 
-INSERT INTO email_address (email_address_id,
-email_address_person_id,
-email_address) VALUES (1,
-1,
-'jon.flanders@mail.com');
-
-INSERT INTO email_address (email_address_id,
-email_address_person_id,
-email_address) VALUES (2,
-1,
-'jonf@anothermail.com');
-
-INSERT INTO email_address (email_address_id,
-email_address_person_id,
-email_address) VALUES (4,
-3,
-'fritz@mail.com');
-
-INSERT INTO email_address (email_address_id,
-email_address_person_id,
-email_address) VALUES (5,
-NULL,
-'aaron@mail.com');
-
 INSERT INTO person (person_id,
 person_first_name,
 person_last_name,
@@ -295,6 +282,31 @@ person_date_added) VALUES (3,
 1,
 '2013-07-14 11:43:31',
 '2013-03-14 11:43:31');
+
+
+INSERT INTO email_address (email_address_id,
+email_address_person_id,
+email_address) VALUES (1,
+1,
+'jon.flanders@mail.com');
+
+INSERT INTO email_address (email_address_id,
+email_address_person_id,
+email_address) VALUES (2,
+1,
+'jonf@anothermail.com');
+
+INSERT INTO email_address (email_address_id,
+email_address_person_id,
+email_address) VALUES (4,
+3,
+'fritz@mail.com');
+
+INSERT INTO email_address (email_address_id,
+email_address_person_id,
+email_address) VALUES (5,
+NULL,
+'aaron@mail.com');
 
 INSERT INTO person_address (person_address_id,
 person_address_person_id,
@@ -338,4 +350,5 @@ phone_number_person_id,
 phone_number) VALUES (4,
 3,
 '555-1215');
+
 

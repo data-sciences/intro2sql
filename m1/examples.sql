@@ -18,7 +18,7 @@ select 1;
 
 select cast(1 as int) as x, 2 as y, 'Zed' as z;
 
--- Another peculiar thing about SQL is that all the decoration is after the
+-- A peculiar thing about SQL is that all the decoration is after the
 -- keyword. In Java, you might say
 --   int x = 1; // there is an integer called x that has the value 1.
 -- in SQL,
@@ -53,6 +53,10 @@ from (select 1 as x, 2 as y, 'Zed' as z);
  formatting and arithmetic.
 
 */
+
+-- You can form multiple rows using union
+
+select 1 as x union select 2 as x
 
 
 
