@@ -20,6 +20,10 @@ USE Contacts;
 
 */
 
+
+USE Contacts;
+go
+
 -- *section*
 
 -- create and drop
