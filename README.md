@@ -23,4 +23,4 @@ The SQLite system used was the Firefox SQLite extension/add-on.
 The SQL Server system was 2008 R2.
 
 
-There is also an example from Wikipedia, called tables1.sql. 
+There is also an example from Wikipedia, called wiki.sql. 
