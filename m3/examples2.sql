@@ -1,5 +1,8 @@
 -- weaves
 
+USE Contacts;
+go
+
 -- Ternary Joins
 
 -- The e-mail address in the previous examples is a simple binary join.
@@ -65,39 +68,81 @@ on p.person_id = e.email_address_person_id;
 
 */
 
--- Here is the query from the link table's point of view.
+-- From the person_address record point-of-view
+-- It is in the centre and we left join to person (to its left) and left join to address (to its right).
 
-select  pa.*, p.person_first_name, p.person_last_, a.address_city, 
+select  pa.*, p.person_first_name, p.person_last_name, a.address_city 
+from person_address pa
+left join person p
+on pa.person_address_person_id = p.person_id
+left join address a
+on pa.person_address_address_id = a.address_id
+
+/* 
+ 
+Note: SQLite has a very relaxed syntax checker. It will allow this
+
+select  pa.*, p.person_first_name, p.person_last_, a.address_city 
 from person_address pa
 left join person p, address a
 on pa.person_address_person_id = p.person_id and 
    pa.person_address_address_id = a.address_id
 
+which would seem to allow you to left-join to two tables simultaneously.
+
+*/
 
 -- From the person point-of-view, the output is the same, but we interpret it
 -- differently: Ahern has two addresses.
+-- From person, we left-join to person_address and then left join to address.
 
-select p.person_first_name, p.person_last_name, a.address_city, 
- pa.*
+select  pa.*, p.person_first_name, p.person_last_name, a.address_city
 from person p
-left join person_address pa, address a
-on pa.person_address_person_id = p.person_id and 
-   pa.person_address_address_id = a.address_id
-
--- Notice that the on clause is unchanged. It is just the order of the
--- join that is different.
-
+left join person_address pa
+on pa.person_address_person_id = p.person_id 
+left join address a
+on pa.person_address_address_id = a.address_id
 
 -- From the address point of view, the output is the same, but we interpret it
--- differently: two people are at the Los Angeles office.
+-- differently: two people are at the Los Angeles office 
+-- *and* we finally pick up the NULL address. We have an address in San Francisco 
+-- where no-one lives.
 
-select p.person_first_name, p.person_last_name, a.address_city, 
- pa.*
+-- On SQL Server use the query execution planner to see this. Type Ctrl-M and then execute the query.
+-- You should see a new tab in results: "Execution Plan". 
+
+select pa.*, p.person_first_name, p.person_last_name, a.address_city
 from address a
-left join person_address pa, person p
-on pa.person_address_person_id = p.person_id and 
-   pa.person_address_address_id = a.address_id
+left join person_address pa
+on pa.person_address_person_id = a.address_id
+left join person p
+on pa.person_address_address_id = p.person_id
 
+/*
+
+Join syntax is hard to understand. Often there are query designers that help, but use phrases like
+"each on the left, all on the right".
+
+For left joins, the "from" table is the left-hand-side, you fix the record 
+and then you "left join to" the table to the right. 
+It then becomes the left table for the next "left join to".
+
+Think of a ternary join as a family tree.
+
+We have the parents in the person table. 
+We have their children in the person_address table. 
+We have their children in the address table.
+
+When we left join from the person table, we are saying, 
+for each grand-parent, find each child, and each of their grand-children.
+
+
+*/
+
+
+/* 
+
+Note: SQLite allows other syntax variants all of which are open to interpretation.
 
 -- These are all subtly different but very wrong.
 
@@ -119,36 +164,7 @@ left join person_address pa
 on pa.person_address_person_id = p.person_id and 
    pa.person_address_address_id = a.address_id
 
--- Question: explain why.
-
-
--- Note: the way the data has been presented doesn't make it too clear that the
--- viewpoints are different. The three queries shown all the records.
--- But if you were to ask where does Ahern live, and who lives in Los Angeles.
-
-select p.person_first_name, p.person_last_name, a.address_city, 
- pa.*
-from person p
-left join person_address pa, address a
-on pa.person_address_person_id = p.person_id and 
-   pa.person_address_address_id = a.address_id
-where p.person_last_name like 'Ahern';
-
-select p.person_first_name, p.person_last_name, a.address_city, 
- pa.*
-from address a
-left join person_address pa, person p
-on pa.person_address_person_id = p.person_id and 
-   pa.person_address_address_id = a.address_id
-where a.address_city like 'Los%';
-
--- And you can also see that you don't need to exact with the join order
-
--- Question: try the Ahern query with address on the left and the
--- Los Angeles query with person on the left.
-
--- Question: when would the join order make a difference? (Hint: how would you
--- find a person with no address?)
+*/
 
 /* 
 
